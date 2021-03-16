@@ -27,7 +27,8 @@ namespace Milestone.Models
         private bool Visited = false;
         private bool Live = false;
         private int Neighbors = 0;
-        private bool Flagged = false;
+        private bool Flagged;
+        // private string imgName = "";
         // for when the board is created, the cells only have locations
         public Cell(int row, int col)
         {
@@ -35,6 +36,7 @@ namespace Milestone.Models
             RowNumber = row;
             ColumnNumber = col;
             Visited = false;
+            // this.imgName = "";
         }
         // data constructor with all possible parameters
         public Cell(int row, int col, bool visited, bool live, int neighbors)
@@ -45,7 +47,21 @@ namespace Milestone.Models
             SetVisited(visited);
             SetLive(live);
             SetNeighbors(neighbors);
+            this.Flagged = false;
+            // this.imgName = "";
         }
+        /*
+        public string getImgName()
+        {
+            return imgName;
+        }
+
+        public void setImgName(string imgName1)
+        {
+            this.imgName = imgName1;
+        }
+        */
+
         // getters and setters for all properties
         public int GetRowNumber()
         {
