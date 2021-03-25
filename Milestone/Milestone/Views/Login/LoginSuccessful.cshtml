@@ -1,0 +1,33 @@
+﻿@model Milestone.Models.UserModel
+
+<div>
+    <h4>Logged In</h4>
+    <hr />
+    <p>Welcome! You are now ready to start playing minesweeper.</p>
+    <form asp-controller="Cell" asp-action="Index">
+        <div class="form-check">
+            <input type="radio" name="level" id="easy" value="easy" class="form-check-input" checked />
+            <label class="form-check-label" for="easy">Easy</label>
+        </div>
+        <div class="form-check">
+            <input type="radio" name="level" id="medium" value="medium" class="form-check-input" />
+            <label class="form-check-label" for="medium">Medium</label>
+        </div>
+        <div class="form-check">
+            <input type="radio" name="level" id="hard" value="hard" class="form-check-input" />
+            <label class="form-check-label" for="hard">Hard</label>
+        </div>
+        <div class="form-check">
+            <input type="radio" name="level" id="expert" value="expert" class="form-check-input" />
+            <label class="form-check-label" for="expert">Expert</label>
+        </div>
+        <br />
+        <div class="form-group">
+            <input type="submit" value="Play Minesweeper" class="btn btn-primary" />
+        </div>
+    </form>
+</div>
+<div>
+    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
+    <a asp-action="Index">Back to List</a>
+</div>
