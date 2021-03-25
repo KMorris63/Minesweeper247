@@ -34,10 +34,39 @@ namespace Milestone.Controllers
         // booleans to allow for the game to continue and for a win
         string winIndicator = "tbd";
 
-        public IActionResult Index()
+        public IActionResult Index(string level)
         {
+            int size;
+            int difficulty;
             // pass the size and difficulty depending on level to create the board
-            myBoard = new Board(10, 10);
+            switch (level)
+            {
+                // easy has 10 bombs on a 10 x 10 grid
+                case "easy":
+                    size = 10;
+                    difficulty = 10;
+                    break;
+                // medium has 12 and 10
+                case "medium":
+                    size = 12;
+                    difficulty = 10;
+                    break;
+                // hard has 15 and 15
+                case "hard":
+                    size = 15;
+                    difficulty = 15;
+                    break;
+                // expert has 18 and 18
+                case "expert":
+                    size = 18;
+                    difficulty = 18;
+                    break;
+                default:
+                    size = 5;
+                    difficulty = 5;
+                    break;
+            }
+            myBoard = new Board(size, difficulty);
             bs = new GameBusinessService(myBoard);
 
             // set up the bombs

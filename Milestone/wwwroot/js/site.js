@@ -68,6 +68,7 @@ $(function () {
 // do button now takes a url to distinguish between desired controller methods 
 function doButtonUpdate(cellNum, urlString) {
     $.ajax({
+        async: true,
         dataType: "json",
         type: "POST",
         url: urlString,
@@ -88,6 +89,7 @@ function doButtonUpdate(cellNum, urlString) {
 // this updates the entire grid to account for flood fill
 function doGridUpdate(cellNum) {
     $.ajax({
+        async: true,
         dataType: "json",
         type: "POST",
         url: '/Cell/HandleButtonClick',

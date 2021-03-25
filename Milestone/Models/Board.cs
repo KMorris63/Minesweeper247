@@ -47,6 +47,9 @@ namespace Milestone.Models
             Size = size;
             Difficulty = difficulty;
 
+            // calculate number of bombs HOPEFULLY integer division
+            numberOfBombs = (size * size) * (difficulty / 100);
+
             // create a new 2D array of type cell
             theGrid = new Cell[Size, Size];
 

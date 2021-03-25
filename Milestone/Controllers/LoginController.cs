@@ -38,5 +38,10 @@ namespace Milestone.Controllers
                 return View("LoginFailure", user);
             }
         }
+
+        public IActionResult SelectDifficulty()
+        {
+            return View("LoginSuccessful");
+        }
     }
 }
