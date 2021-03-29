@@ -1,5 +1,5 @@
 ﻿@model IEnumerable<Milestone.Models.Cell>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
 <style>
     .game-button {
         width: 50px;
@@ -34,7 +34,6 @@
         font-size: 8px;
         text-align: center;
     }
-
 </style>
 
 @{
@@ -87,9 +86,20 @@
                 </button>
 
             </div>
-         }
+        }
     </div>
 </form>
 <p>
     <a asp-controller="Login" asp-action="SelectDifficulty">New Game</a>
 </p>
+
+@using (Html.BeginForm("onSave", "Cell"))
+{
+    <button type="submit" name="save" class="save">Save Game</button>
+}
+<!--
+@using (Html.BeginForm("Index2", "Cell"))
+{
+    <button type="submit" name="load">Load Game</button>
+}
+    -->

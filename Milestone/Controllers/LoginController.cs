@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Milestone.Models;
 using Milestone.Views.Services;
+using Nancy.Session;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,8 +31,13 @@ namespace Milestone.Controllers
         public IActionResult ProcessLogin(UserModel user)
         {
             SecurityService security = new SecurityService();
-            if (security.loginUser(user))
+            // if -1 was returned, that means the user was not found
+            // otherwise, the value should be the userID
+            int userID = security.loginUser(user);
+            if (userID != -1)
             {
+                // set the session variables
+                HttpContext.Session.SetInt32("userID", userID);
                 return View("LoginSuccessful", user);
             }
             else

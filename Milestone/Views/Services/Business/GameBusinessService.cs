@@ -217,5 +217,29 @@ namespace Milestone.Views.Services.Business
         {
             return myBoard;
         }
+        
+        // for load, the list sometimes does not match the grid, refresh to make them match
+        public void refreshGrid()
+        {
+            // keep count for the list
+            int counter = 0;
+            // for easier referencing
+            Cell[,] grid = new Cell[myBoard.GetSize(), myBoard.GetSize()];
+            List<Cell> cells = myBoard.GetCellList();
+            // for every cell in the list, create a new grid 
+            for (int i = 0; i < myBoard.GetSize(); i++)
+            {
+                for (int j = 0; j < myBoard.GetSize(); j++)
+                {
+                    // assign the cell to the location
+                    grid[i, j] = cells.ElementAt(counter);
+                    // counter will incremement to match with the list location
+                    counter++;
+                }
+            }
+
+            // replace the board grid
+            myBoard.SetGrid(grid);
+        }
     }
 }

@@ -22,8 +22,6 @@ namespace Milestone.Controllers
 {
     public class RegisterController : Controller
     {
-
-
         public IActionResult Index()
         {
             return View();

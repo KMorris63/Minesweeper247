@@ -56,10 +56,10 @@ namespace Milestone.Views.Services
             return success;
         }
 
-        public bool findByUsernamePassword(UserModel user)
+        public int findByUsernamePassword(UserModel user)
         {
-            // assume negative result
-            bool success = false;
+            // send userID up through layers
+            int userID = -1;
 
             // prepared statements for increased security
             string sqlStatement = "SELECT * FROM dbo.users WHERE username = @username AND password = @password";
@@ -78,7 +78,10 @@ namespace Milestone.Views.Services
                     SqlDataReader reader = cmd.ExecuteReader();
                     if (reader.HasRows)
                     {
-                        success = true;
+                        while (reader.Read())
+                        {
+                            userID = (int)reader.GetValue(0);
+                        }
                     }
                 }
                 catch (Exception e)
@@ -86,7 +89,7 @@ namespace Milestone.Views.Services
                     Console.WriteLine(e.Message);
                 };
             }
-            return success;
+            return userID;
         }
 
     }

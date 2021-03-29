@@ -1,14 +1,17 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
 /**
- * @author Alex Vergara and Kacey Morris
- * February 17, 2021
- * CST 247 Milestone 2
- * Minesweeper Web App Basic Game Board
- * Cell.cs
+ * Kacey Morris
+ * Alex Vergara
+ * March 28 2021
+ * CST 247
+ * Milestone 4 - Save, Load, and API
+ * GameObject.cs
  * 
  * This class creates individual cells for the board. It defines the properties of a cell and the different constructors.
  * 
@@ -17,18 +20,39 @@ using System.Threading.Tasks;
 
 namespace Milestone.Models
 {
+    [DataContract]
+    public class RootObject
+    {
+        [DataMember(Name = "cell")]
+        public Cell cell { get; set; }
+    }
+
+    [DataContract]
     public class Cell
     {
         // NEW
+        [DataMember(Name = "id")]
         private int ID = -1;
         // initialize properties with default values
+        [DataMember(Name = "RowNumber")]
         private int RowNumber = -1;
+        [DataMember(Name = "ColumnNumber")]
         private int ColumnNumber = -1;
+        [DataMember(Name = "Visited")]
         private bool Visited = false;
+        [DataMember(Name = "Live")]
         private bool Live = false;
+        [DataMember(Name = "Neighbors")]
         private int Neighbors = 0;
+        [DataMember(Name = "Flagged")]
         private bool Flagged;
         // private string imgName = "";
+        // empty constructor
+        public Cell()
+        {
+            // do nothing
+        }
+
         // for when the board is created, the cells only have locations
         public Cell(int row, int col)
         {

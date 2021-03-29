@@ -23,6 +23,15 @@ namespace Milestone
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDistributedMemoryCache();
+
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromSeconds(36000000);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+
             services.AddControllersWithViews();
         }
 
@@ -46,11 +55,29 @@ namespace Milestone
 
             app.UseAuthorization();
 
+            app.UseSession();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+                // route to show 1 game
+                // Example 
+                // ? just means the id is optional in the route
+                endpoints.MapControllerRoute(
+                    name: "cell",
+                    pattern: "{controller=Cell}/{action=ApiShowSavedGame}/{id?}");
+
+                endpoints.MapControllerRoute(
+                    name: "cell2",
+                    pattern: "{controller=Cell}/{action=ApiShowAllSavedGames}");
+
+                endpoints.MapControllerRoute(
+                    name: "cell3",
+                    pattern: "{controller=Cell}/{action=ApiDeleteSavedGame}/{id?}");
+
             });
         }
     }

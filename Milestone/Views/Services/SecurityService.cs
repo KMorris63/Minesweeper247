@@ -27,7 +27,7 @@ namespace Milestone.Views.Services
             return SecurityDAO.RegisterUser(user);
         }
 
-        public bool loginUser(UserModel user)
+        public int loginUser(UserModel user)
         {
             return SecurityDAO.findByUsernamePassword(user);
         }

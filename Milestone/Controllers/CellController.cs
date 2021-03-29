@@ -2,10 +2,15 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Http;
 using Milestone.Models;
+using Milestone.Utility;
 using Milestone.Views.Services.Business;
+using Nancy.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,9 +18,9 @@ using System.Threading.Tasks;
 /**
  * Kacey Morris
  * Alex Vergara
- * March 15 2021
+ * March 28 2021
  * CST 247
- * Milestone 3 - Flags and Game Over
+ * Milestone 4 - Save, Load, and API
  * CellController.cs
  * 
  * This class controls all background for the game play. It sets up the game and returns views. 
@@ -34,40 +39,13 @@ namespace Milestone.Controllers
         // booleans to allow for the game to continue and for a win
         string winIndicator = "tbd";
 
+        // to keep track of the user id
+        int userID = -1;
+
         public IActionResult Index(string level)
         {
-            int size;
-            int difficulty;
-            // pass the size and difficulty depending on level to create the board
-            switch (level)
-            {
-                // easy has 10 bombs on a 10 x 10 grid
-                case "easy":
-                    size = 10;
-                    difficulty = 10;
-                    break;
-                // medium has 12 and 10
-                case "medium":
-                    size = 12;
-                    difficulty = 10;
-                    break;
-                // hard has 15 and 15
-                case "hard":
-                    size = 15;
-                    difficulty = 15;
-                    break;
-                // expert has 18 and 18
-                case "expert":
-                    size = 18;
-                    difficulty = 18;
-                    break;
-                default:
-                    size = 5;
-                    difficulty = 5;
-                    break;
-            }
-            myBoard = new Board(size, difficulty);
-            bs = new GameBusinessService(myBoard);
+            // create the board passing the level 
+            createBoard(level);
 
             // set up the bombs
             bs.setupLiveNeighbors();
@@ -76,9 +54,37 @@ namespace Milestone.Controllers
             // set the number of bombs to what was passed through
             bs.GetBoard().SetNumberOfBombs(10);
 
+            // save the user ID right away
+            try
+            {
+                userID = (int)HttpContext.Session.GetInt32("userID");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error - session expired");
+                userID = -1;
+            }
+
             // pass list of cells to view
             return View("Index", bs.GetBoard().GetCellList());
         }
+
+        public IActionResult Index2()
+        {
+            GamesDAO gamesDAO = new GamesDAO();
+
+            GameObject gameObject = gamesDAO.loadGame();
+            List<Cell> cellList = JsonConvert.DeserializeObject<List<Cell>>(gameObject.JsonString);
+
+            // make the boards cell list the cell list that was retrieved
+            bs.GetBoard().SetCellList(cellList);
+            // make sure the grid matches the cell list passed so flood fill and win works
+            bs.refreshGrid();
+
+            // pass list of cells to view
+            return View("Index", cellList);
+        }
+
         public IActionResult HandleButtonClick(int cellNum)
         {
             Cell currentCell = bs.GetBoard().GetCellList().ElementAt(cellNum);
@@ -171,6 +177,220 @@ namespace Milestone.Controllers
                 viewResult.View.RenderAsync(viewContext);
                 return sw.GetStringBuilder().ToString();
             }
+        }
+
+        public ActionResult onSave()
+        {
+            JavaScriptSerializer jss = new JavaScriptSerializer();
+
+            GamesDAO gamesDAO = new GamesDAO();
+
+            // get list
+            List<Cell> cellList = bs.GetBoard().GetCellList();
+
+            string jsonData = JsonConvert.SerializeObject(cellList);
+            // string jsonData = JsonConvert.SerializeObject(new { jsonData = cellList });
+
+            int getUserID = (int)HttpContext.Session.GetInt32("userID");
+            GameObject gameObject = new GameObject(0, jsonData, getUserID, DateTime.Now);
+
+            bool success = gamesDAO.saveGame(gameObject);
+
+            Tuple<bool, string> resultsTuple = new Tuple<bool, string>(success, jsonData);
+
+            return View("Index", cellList);
+
+            //return View("Results", resultsTuple);
+        }
+
+        public ActionResult onLoad()
+        {
+            JavaScriptSerializer jss = new JavaScriptSerializer();
+
+            GamesDAO gamesDAO = new GamesDAO();
+            // get cell List
+            List<Cell> cellList = bs.GetBoard().GetCellList();
+            // serialize cells List into JSON
+            // return game object
+            GameObject gameObject = gamesDAO.loadGame();
+            //
+            cellList = JsonConvert.DeserializeObject<List<Cell>>(gameObject.JsonString);
+
+            // tuple to send multiple parts of data
+            Tuple<bool, string> resultsTuple = new Tuple<bool, string>(true, JsonConvert.SerializeObject(cellList));
+
+            return View("Results", resultsTuple);
+
+        }
+
+        public IActionResult onDelete(string gameIDString)
+        {
+            // delete the game
+            GamesDAO dao = new GamesDAO();
+            int gameID = Int32.Parse(gameIDString);
+            bool success = dao.deleteGameByID(gameID);
+
+            try
+            {
+                userID = (int)HttpContext.Session.GetInt32("userID");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error - session expired");
+                userID = -1;
+            }
+
+            // update the list and return the view again
+            List<GameObject> games = dao.getGameByUser(userID);
+            return View("SavedGames", games);
+        }
+
+        public IActionResult ApiDeleteSavedGame(int id)
+        {
+            GamesDAO dao = new GamesDAO();
+            bool success = dao.deleteGameByID(id);
+            try
+            {
+                userID = (int)HttpContext.Session.GetInt32("userID");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error - session expired");
+                userID = -1;
+            }
+            List<GameObject> games = dao.getGameByUser(userID);
+            return View("SavedGames", games);
+        }
+
+
+        public IActionResult SavedGames()
+        {
+            // get the games for this user
+            GamesDAO dao = new GamesDAO();
+            // if we havent saved the ID yet
+            try
+            {
+                userID = (int)HttpContext.Session.GetInt32("userID");
+            } catch (Exception e)
+            {
+                Console.WriteLine("Error - session expired");
+                userID = -1;
+            }
+            List<GameObject> games = dao.getGameByUser(userID);
+            return View("SavedGames", games);
+        }
+
+
+        /// <summary>
+        /// API Shows all Games in JSON format
+        /// Changes were made to Startup.cs File around line 73
+        /// Follow Route https://localhost:5001/cell/ApiShowAllSavedGames
+        /// </summary>
+        /// <returns></returns>        
+        public string ApiShowAllSavedGames()
+        {
+            // Instantiate DAO
+            GamesDAO gamesDAO = new GamesDAO();
+            // get all games
+            List<GameObject> games = gamesDAO.getAllGames();
+            // convert all game objects into JSON
+            string jsonData = JsonConvert.SerializeObject(games);
+            // Return JSON Data
+            return jsonData;
+
+        }
+
+        public IActionResult onContinue(string gameIDString)
+        {
+            string level = "easy";
+            int gameID = Int32.Parse(gameIDString);
+            GamesDAO gamesDAO = new GamesDAO();
+
+            GameObject gameObject = gamesDAO.loadGameByID(gameID);
+            List<Cell> cellList = JsonConvert.DeserializeObject<List<Cell>>(gameObject.JsonString);
+
+            switch (Math.Sqrt(cellList.Count))
+            {
+                case 10:
+                    level = "easy";
+                    break;
+                case 12:
+                    level = "medium";
+                    break;
+                case 15:
+                    level = "hard";
+                    break;
+                case 18:
+                    level = "expert";
+                    break;
+            }
+            createBoard(level);
+
+            // make the boards cell list the cell list that was retrieved
+            bs.GetBoard().SetCellList(cellList);
+            // make sure the grid matches the cell list passed so flood fill and win works
+            bs.refreshGrid();
+
+            // pass list of cells to view
+            return View("Index", cellList);
+        }
+
+
+
+        /// <summary>
+        /// API - shows saved game by id
+        /// Route Example: https://localhost:5001/cell/apiShowSavedGame/3
+        /// Must be logged in to use
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public string ApiShowSavedGame(int id)
+        {
+            // Instantiate DAO
+            GamesDAO gamesDAO = new GamesDAO();
+            // gets game object by ID
+            GameObject gameObject = gamesDAO.loadGameByID(id);
+            // converts game object to JSON
+            string jsonData = JsonConvert.SerializeObject(gameObject);
+            // returns JSON data
+            return jsonData;
+
+        }
+
+        public void createBoard(string level)
+        {
+            int size;
+            int difficulty;
+            // pass the size and difficulty depending on level to create the board
+            switch (level)
+            {
+                // easy has 10 bombs on a 10 x 10 grid
+                case "easy":
+                    size = 10;
+                    difficulty = 10;
+                    break;
+                // medium has 12 and 10
+                case "medium":
+                    size = 12;
+                    difficulty = 10;
+                    break;
+                // hard has 15 and 15
+                case "hard":
+                    size = 15;
+                    difficulty = 15;
+                    break;
+                // expert has 18 and 18
+                case "expert":
+                    size = 18;
+                    difficulty = 18;
+                    break;
+                default:
+                    size = 5;
+                    difficulty = 5;
+                    break;
+            }
+            myBoard = new Board(size, difficulty);
+            bs = new GameBusinessService(myBoard);
         }
     }
 }

@@ -4,6 +4,7 @@
     <h4>Logged In</h4>
     <hr />
     <p>Welcome! You are now ready to start playing minesweeper.</p>
+    <p>Start a new game: </p>
     <form asp-controller="Cell" asp-action="Index">
         <div class="form-check">
             <input type="radio" name="level" id="easy" value="easy" class="form-check-input" checked />
@@ -26,8 +27,4 @@
             <input type="submit" value="Play Minesweeper" class="btn btn-primary" />
         </div>
     </form>
-</div>
-<div>
-    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
-    <a asp-action="Index">Back to List</a>
 </div>

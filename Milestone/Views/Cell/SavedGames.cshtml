@@ -1,0 +1,46 @@
+﻿@model List<Milestone.Utility.GameObject>
+
+@{
+    ViewData["Title"] = "SavedGames";
+}
+
+<h1>Saved Games</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Game ID
+            </th>
+            <th>
+                Date Saved
+            </th>
+            <th>Continue</th>
+            <th>Delete</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.datePlayed)
+            </td>
+            <td>
+                @using (Html.BeginForm("onContinue", "Cell", FormMethod.Post))
+                {
+                    <button type="submit" name="gameIDString" value="@Html.DisplayFor(modelItem => item.id)" id="load">Play</button>
+                }
+            </td>
+            <td>
+                @using (Html.BeginForm("onDelete", "Cell", FormMethod.Post))
+                {
+                    <button type="submit" name="gameIDString" value="@Html.DisplayFor(modelItem => item.id)" id="delete">Delete</button>
+                }
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

@@ -1,0 +1,32 @@
+﻿@model Tuple<bool, string>
+@{ 
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Results</title>
+</head>
+<body>
+    <div>
+        @if (Model.Item1)
+        {
+            @Model.Item2
+        }
+        else
+        {
+            <p>Failure</p>
+        }
+    </div>
+
+
+</body>
+
+</html>
+
+
+
+
+
