@@ -11,3 +11,11 @@ CREATE TABLE [dbo].[users] (
     PRIMARY KEY CLUSTERED ([Id] ASC),
     UNIQUE NONCLUSTERED ([username] ASC)
 );
+
+CREATE TABLE [dbo].[games] (
+    [Id]         INT      IDENTITY (1, 1) NOT NULL,
+    [gameString] TEXT     NULL,
+    [userID]     INT      NULL,
+    [datePlayed] DATETIME NULL,
+    PRIMARY KEY CLUSTERED ([Id] ASC)
+);
