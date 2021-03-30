@@ -23,6 +23,8 @@ namespace Milestone.Views.Services.Business
     {
         // pass the board of cells
         private static Board myBoard;
+        public string boardLevel { get; set; }
+
         // data constructor
         public GameBusinessService(Board board)
         {

@@ -46,9 +46,19 @@ namespace Milestone.Controllers
             }
         }
 
+        [HttpGet]
+        [CustomAuthorization]
         public IActionResult SelectDifficulty()
         {
             return View("LoginSuccessful");
+        }
+
+        [HttpGet]
+        [CustomAuthorization]
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            return View("Index");
         }
     }
 }

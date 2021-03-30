@@ -28,7 +28,7 @@ namespace Milestone.Utility
         {
             bool success = false;
 
-            String queryString = "INSERT INTO dbo.games (gameString, userID, datePlayed) VALUES (@gameString, @userID, @datePlayed)";
+            String queryString = "INSERT INTO dbo.games (gameString, userID, datePlayed, level) VALUES (@gameString, @userID, @datePlayed, @level)";
 
             using(SqlConnection sqlConnection = new SqlConnection(connectionString))
             {
@@ -37,6 +37,7 @@ namespace Milestone.Utility
                     sqlCommand.Parameters.Add("@gameString", SqlDbType.Text).Value = game.JsonString;
                     sqlCommand.Parameters.Add("@userID", SqlDbType.Int, 100).Value = game.userID;
                     sqlCommand.Parameters.Add("@datePlayed", SqlDbType.DateTime).Value = game.datePlayed;
+                    sqlCommand.Parameters.Add("@level", SqlDbType.NVarChar, 50).Value = game.level;
 
                     try
                     {
@@ -57,9 +58,10 @@ namespace Milestone.Utility
 
         }
 
+        /*
         public GameObject loadGame()
         {
-            GameObject gameObject = new GameObject(1, "", 1, DateTime.Now);
+            GameObject gameObject = new GameObject(1, "", 1, DateTime.Now, "easy");
 
             // gets the latest game saved
             // refactor to get a specific game
@@ -92,6 +94,7 @@ namespace Milestone.Utility
             return gameObject;
 
         }
+        */
 
         public List<GameObject> getAllGames()
         {
@@ -116,7 +119,7 @@ namespace Milestone.Utility
                             while (reader.Read())
                             {
                                 // create a new game from the information from the database
-                                GameObject game = new GameObject((int)reader.GetValue(0), (string)reader.GetValue(1), (int)reader.GetValue(2), (DateTime)reader.GetValue(3));
+                                GameObject game = new GameObject((int)reader.GetValue(0), (string)reader.GetValue(1), (int)reader.GetValue(2), (DateTime)reader.GetValue(3), (string)reader.GetValue(4));
                                 // add the game to the list
                                 games.Add(game);
                             }
@@ -161,7 +164,7 @@ namespace Milestone.Utility
                             while (reader.Read())
                             {
                                 // create a new game from the information from the database
-                                GameObject game = new GameObject((int)reader.GetValue(0), (string)reader.GetValue(1), (int)reader.GetValue(2), (DateTime)reader.GetValue(3));
+                                GameObject game = new GameObject((int)reader.GetValue(0), (string)reader.GetValue(1), (int)reader.GetValue(2), (DateTime)reader.GetValue(3), (string)reader.GetValue(4));
                                 // add the game to the list
                                 games.Add(game);
                             }
@@ -205,7 +208,7 @@ namespace Milestone.Utility
                             while (reader.Read())
                             {
                                 // create a new game from the information from the database
-                                game = new GameObject((int)reader.GetValue(0), (string)reader.GetValue(1), (int)reader.GetValue(2), (DateTime)reader.GetValue(3));
+                                game = new GameObject((int)reader.GetValue(0), (string)reader.GetValue(1), (int)reader.GetValue(2), (DateTime)reader.GetValue(3), (string)reader.GetValue(4));
                             }
                         }
                         // close connection
@@ -252,16 +255,6 @@ namespace Milestone.Utility
             }
             // return the list of games
             return success;
-        }
-
-        public void getSingleGame()
-        {
-
-        }
-
-        public void deleteSingleGame()
-        {
-
         }
     }
 }

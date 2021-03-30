@@ -15,6 +15,7 @@
             <th>
                 Date Saved
             </th>
+            <th>Level</th>
             <th>Continue</th>
             <th>Delete</th>
         </tr>
@@ -29,15 +30,18 @@
                 @Html.DisplayFor(modelItem => item.datePlayed)
             </td>
             <td>
+                @Html.DisplayFor(modelItem => item.level)
+            </td>
+            <td>
                 @using (Html.BeginForm("onContinue", "Cell", FormMethod.Post))
                 {
-                    <button type="submit" name="gameIDString" value="@Html.DisplayFor(modelItem => item.id)" id="load">Play</button>
+                    <button class="btn-outline-success" type="submit" name="gameIDString" value="@Html.DisplayFor(modelItem => item.id)" id="load">Play</button>
                 }
             </td>
             <td>
                 @using (Html.BeginForm("onDelete", "Cell", FormMethod.Post))
                 {
-                    <button type="submit" name="gameIDString" value="@Html.DisplayFor(modelItem => item.id)" id="delete">Delete</button>
+                    <button class="btn-outline-danger" type="submit" name="gameIDString" value="@Html.DisplayFor(modelItem => item.id)" id="delete">Delete</button>
                 }
             </td>
         </tr>

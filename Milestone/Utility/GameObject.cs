@@ -27,13 +27,14 @@ namespace Milestone.Utility
         [DataMember(Name = "datePlayed")]
         public DateTime datePlayed { get; set; }
         [DataMember(Name = "level")]
-        public DateTime level { get; set; }
-        public GameObject(int ID, string JSONString, int UserID, DateTime DatePlayed)
+        public string level { get; set; }
+        public GameObject(int ID, string JSONString, int UserID, DateTime DatePlayed, string Level)
         {
             this.id = ID;
             this.JsonString = JSONString;
             this.userID = UserID;
             this.datePlayed = DatePlayed;
+            this.level = Level;
         }
         public GameObject()
         {

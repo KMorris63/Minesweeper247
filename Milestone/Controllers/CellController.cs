@@ -42,6 +42,7 @@ namespace Milestone.Controllers
         // to keep track of the user id
         int userID = -1;
 
+        [CustomAuthorization]
         public IActionResult Index(string level)
         {
             // create the board passing the level 
@@ -67,22 +68,6 @@ namespace Milestone.Controllers
 
             // pass list of cells to view
             return View("Index", bs.GetBoard().GetCellList());
-        }
-
-        public IActionResult Index2()
-        {
-            GamesDAO gamesDAO = new GamesDAO();
-
-            GameObject gameObject = gamesDAO.loadGame();
-            List<Cell> cellList = JsonConvert.DeserializeObject<List<Cell>>(gameObject.JsonString);
-
-            // make the boards cell list the cell list that was retrieved
-            bs.GetBoard().SetCellList(cellList);
-            // make sure the grid matches the cell list passed so flood fill and win works
-            bs.refreshGrid();
-
-            // pass list of cells to view
-            return View("Index", cellList);
         }
 
         public IActionResult HandleButtonClick(int cellNum)
@@ -192,7 +177,7 @@ namespace Milestone.Controllers
             // string jsonData = JsonConvert.SerializeObject(new { jsonData = cellList });
 
             int getUserID = (int)HttpContext.Session.GetInt32("userID");
-            GameObject gameObject = new GameObject(0, jsonData, getUserID, DateTime.Now);
+            GameObject gameObject = new GameObject(0, jsonData, getUserID, DateTime.Now, bs.boardLevel);
 
             bool success = gamesDAO.saveGame(gameObject);
 
@@ -201,26 +186,6 @@ namespace Milestone.Controllers
             return View("Index", cellList);
 
             //return View("Results", resultsTuple);
-        }
-
-        public ActionResult onLoad()
-        {
-            JavaScriptSerializer jss = new JavaScriptSerializer();
-
-            GamesDAO gamesDAO = new GamesDAO();
-            // get cell List
-            List<Cell> cellList = bs.GetBoard().GetCellList();
-            // serialize cells List into JSON
-            // return game object
-            GameObject gameObject = gamesDAO.loadGame();
-            //
-            cellList = JsonConvert.DeserializeObject<List<Cell>>(gameObject.JsonString);
-
-            // tuple to send multiple parts of data
-            Tuple<bool, string> resultsTuple = new Tuple<bool, string>(true, JsonConvert.SerializeObject(cellList));
-
-            return View("Results", resultsTuple);
-
         }
 
         public IActionResult onDelete(string gameIDString)
@@ -262,7 +227,8 @@ namespace Milestone.Controllers
             return View("SavedGames", games);
         }
 
-
+        [HttpGet]
+        [CustomAuthorization]
         public IActionResult SavedGames()
         {
             // get the games for this user
@@ -306,7 +272,9 @@ namespace Milestone.Controllers
             int gameID = Int32.Parse(gameIDString);
             GamesDAO gamesDAO = new GamesDAO();
 
+            // load the game
             GameObject gameObject = gamesDAO.loadGameByID(gameID);
+            // get the game state
             List<Cell> cellList = JsonConvert.DeserializeObject<List<Cell>>(gameObject.JsonString);
 
             switch (Math.Sqrt(cellList.Count))
@@ -324,6 +292,7 @@ namespace Milestone.Controllers
                     level = "expert";
                     break;
             }
+            // set up the business service and board for this new game
             createBoard(level);
 
             // make the boards cell list the cell list that was retrieved
@@ -391,6 +360,8 @@ namespace Milestone.Controllers
             }
             myBoard = new Board(size, difficulty);
             bs = new GameBusinessService(myBoard);
+
+            bs.boardLevel = level;
         }
     }
 }

@@ -90,16 +90,8 @@
     </div>
 </form>
 <p>
-    <a asp-controller="Login" asp-action="SelectDifficulty">New Game</a>
+    @using (Html.BeginForm("onSave", "Cell"))
+    {
+        <button class="save btn-info" type="submit" name="save">Save Game</button>
+    }
 </p>
-
-@using (Html.BeginForm("onSave", "Cell"))
-{
-    <button type="submit" name="save" class="save">Save Game</button>
-}
-<!--
-@using (Html.BeginForm("Index2", "Cell"))
-{
-    <button type="submit" name="load">Load Game</button>
-}
-    -->
